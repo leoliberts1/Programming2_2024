@@ -38,6 +38,8 @@ def main():
                 position = pygame.mouse.get_pos()
                 rinda,kolonna = get_row_and_column_from_the_player(position)
 
+                game.select(rinda,kolonna)
+
         game.update()
 
         #extra lietas ne no video
