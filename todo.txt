@@ -1,0 +1,24 @@
+CHECKERS GAME
+
+Fix the movement of queens, for now there is no advantage to being one
+Make it so that every piece can kill other pieces when going backwards
+Make vairāku kauliņu kaušanu iespējamu
+
+
+
+Ability to play against other people
+
+I could make it so that I give each person the current state of the game and each of them get to make a turn, they both
+will be able to render the game, but the server will be actually the one that has the game state, I will send where to where
+the people want to move their things.
+I will lock people and say that it is not their turn whenever they try to make a move when it is not their turn, they get to
+wait untill the other person has made a choice, then they get to make a move.
+The client side can only visualize the game and register the fact they want to make a move that then gets sent to the server
+that changes the game state, sends it to both players and then indicates whose turn it is
+
+
+
+
+
+The posibility of making it into a website where people can play against eachother
+Find someone else that has made it and try to adjust it to this

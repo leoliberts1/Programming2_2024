@@ -5,6 +5,7 @@ from checkers_game.SPĒLES_GALDS import SPĒLES_GALDS
 from checkers_game.spēle import Spēle
 #No sākuma uztaisīsim pygame skatlogu
 #tad sākšu taisīt kā vispār spēli varēs spēlēt
+
 pygame.init()
 GAME_WINDOW = pygame.display.set_mode((WIDTH,HEIGHT))
 pygame.display.set_caption("CHECKERS")
@@ -20,14 +21,15 @@ def main():
     fps = 60
     run = True
     clock = pygame.time.Clock()
-
     game = Spēle(GAME_WINDOW)
     #kauliņš = Spēles_galds.dabūt_kauliņu(0,1)
     #Spēles_galds.kustēties(kauliņš,3,4)
     #"event loop" īstā funkcija kas strādās
     while run :
         clock.tick(fps)
-
+        if game.get_winner() != None:
+            print(game.get_winner())
+            game.reset()
         for action_of_the_player in pygame.event.get():
             if action_of_the_player.type == pygame.QUIT:
                 run = False
@@ -37,8 +39,10 @@ def main():
                 # vai vēl kko izdarījis.
                 position = pygame.mouse.get_pos()
                 rinda,kolonna = get_row_and_column_from_the_player(position)
-
+                #print(position)
+                print(rinda,kolonna)
                 game.select(rinda,kolonna)
+                print(game.game_table.game_table)
 
         game.update()
 

@@ -39,7 +39,7 @@ class SPĒLES_GALDS:
                 if kauliņš != 0:
                     kauliņš.draw_the_piece(game_window)
 
-    def draw_valid_moves(self, moves, game_window):
+    def draw_possible_moves(self, moves, game_window):
         for move in moves:
             row, column = move
             pygame.draw.circle(game_window, BLUE, (column * SQUARE_SIZE + SQUARE_SIZE // 2, row * SQUARE_SIZE + SQUARE_SIZE // 2), 10)

@@ -9,7 +9,8 @@ class Spēle:
 
     def update(self):
         self.game_table.draw(self.game_window)
-        self.game_table.draw_valid_moves(self.possible_moves, self.game_window)
+        self.game_table.draw_possible_moves(self.possible_moves, self.game_window)
+
         pygame.display.update()
 
     def __init(self):
@@ -22,12 +23,15 @@ class Spēle:
         self.__init()
 
     def select(self, row, column):
+        #If a piece has already been chosen
+        #it gets moved
         if self.selected:
             result = self._move(row, column)
             if not result:
                 self.selected = None
                 self.select(row, column)
         piece = self.game_table.get_piece(row, column)
+        #else the piece becomes the selected one
         if piece != 0 and piece.color == self.turn:
             self.selected = piece
             self.possible_moves = self.game_table.get_possible_moves(piece)
@@ -55,7 +59,7 @@ class Spēle:
 
     def get_winner(self):
         if self.game_table.red_left <= 0:
-            return WHITE
+            return "WHITE"
         elif self.game_table.white_left <= 0:
-            return RED
+            return "RED"
         return None
