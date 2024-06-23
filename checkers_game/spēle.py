@@ -18,6 +18,8 @@ class Spēle:
         self.game_table = SPĒLES_GALDS()
         self.turn = RED
         self.possible_moves = {}
+        self.previous_changes = self.game_table.previous_changes
+        self.changes = self.game_table.changes
 
     def reset(self):
         self.__init()

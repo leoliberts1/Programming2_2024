@@ -1,12 +1,19 @@
-import pickle, socket, pygame,time
+import pickle, socket, pygame,time, copy
 from checkers_game.spēle import Spēle
 from checkers_game.constants import WIDTH,HEIGHT,COLUMNS,ROWS,SQUARE_SIZE,RED,WHITE,BLUE,BLACK
+from checkers_game.Kauliņi import Kauliņš
 server = socket.socket()
 
 HOST = ""
 PORT = 8000
+try:
+    server.bind((HOST,PORT))
+except OSError as e:
+    print(e)
+    HOST = ""
+    PORT = 8080
+    server.bind((HOST,PORT))
 
-server.bind((HOST,PORT))
 
 server.listen(1)
 
@@ -34,7 +41,7 @@ def main():
             break
         #we get the game table that will be sent to both clients
         game_table = game.game_table.game_table
-        previous_game_table = game_table.copy()
+        previous_game_table = copy.deepcopy(game_table)
         print(game_table)
         '''[[0, (255, 255, 255), 0, (255, 255, 255), 0, (255, 255, 255), 0, (255, 255, 255)],
             [(255, 255, 255), 0, (255, 255, 255), 0, (255, 255, 255), 0, (255, 255, 255), 0],
@@ -47,6 +54,7 @@ def main():
                This is how the table will approximately look'''
         possible_moves = game.possible_moves
         print(possible_moves)
+        print("game turn = ", game.turn)
         if game.turn == RED:
             conn1.send(pickle.dumps("Your turn",-1))
             conn1.send(pickle.dumps(game_table,-1))
@@ -61,13 +69,41 @@ def main():
                 print(row,column)
                 game.select(row,column)
                 print([game.game_table.game_table,game.possible_moves],"This is the game table and the possible moves table before sending it again after something was selected")
-                conn1.send(pickle.dumps([game.game_table.game_table,game.possible_moves],-1))
-                if previous_game_table != game.game_table.game_table:
+
+                possible_moves = game.possible_moves
+                conn1.send(pickle.dumps([game_table,possible_moves],-1))
+                print(Kauliņš.old_changes,"old changes count")
+                print(Kauliņš.changes,"new count changes")
+                if Kauliņš.changes != Kauliņš.old_changes:
                     made_move = True
+                    print(conn1,"Has ended their turn")
+                    conn1.send(pickle.dumps("Not your move",-1))
+                    #conn1.send(pickle.dumps(game.game_table.game_table,-1))
+                    Kauliņš.old_changes +=1
         else:
-            conn2.send(pickle.dumps("Your turn",-1))
-            conn1.send(pickle.dumps(game_table, -1))
+            conn2.send(pickle.dumps("Your turn", -1))
             conn2.send(pickle.dumps(game_table, -1))
+            time.sleep(0.1)
+            conn2.send(pickle.dumps(possible_moves, -1))
+            conn1.send(pickle.dumps(game_table, -1))
+            made_move = False
+            # conn2.send(pickle.dumps("Not your turn", -1))
+            while made_move == False:
+                # Here I get the position of whatever the client has selected
+                row, column = pickle.loads(conn2.recv(1024))
+                print(row, column)
+                game.select(row, column)
+                print([game.game_table.game_table, game.possible_moves],
+                      "This is the game table and the possible moves table before sending it again after something was selected")
+                game_table = game.game_table.game_table
+                possible_moves = game.possible_moves
+                conn2.send(pickle.dumps([game_table, possible_moves], -1))
+                if Kauliņš.changes == Kauliņš.old_changes:
+                    made_move = True
+                    print(conn2, "Has ended their turn")
+                    conn2.send(pickle.dumps("Not your move", -1))
+                    conn2.send(pickle.dumps(game.game_table.game_table, -1))
+                    Kauliņš.old_changes += 1
 
 
         #game.update()
@@ -76,5 +112,5 @@ def main():
         #SKATLOGS.fill(BALTA)
         #pygame.display.flip()
 
-    pygame.quit()
+    #pygame.quit()
 main()

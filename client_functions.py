@@ -20,7 +20,7 @@ class client_functions():
         pygame.draw.circle(game_window, self.color, (self.x, self.y), rādiuss)
         if self.queen:
             game_window.blit(CROWN, (self.x - (CROWN.get_width() // 2), self.y - (CROWN.get_height() // 2)))'''
-        print(kauliņš)
+        #print(kauliņš)
         rādiuss = SQUARE_SIZE //2 - self.padding
         krāsa = (255,255,255)
         #if kauliņš == krāsa:
@@ -32,14 +32,15 @@ class client_functions():
             row, column = move
             pygame.draw.circle(game_window, BLUE, (column * SQUARE_SIZE + SQUARE_SIZE // 2, row * SQUARE_SIZE + SQUARE_SIZE // 2), 10)
     def draw(self, game_window,game_table,possible_moves):
-        print(game_table,"this is the game table")
+        print("this is the game table","client_functions")
         self.draw_the_game_table(game_window)
         for rinda in range(ROWS):
             for kolonna in range(COLUMNS):
                 kauliņš = game_table[rinda][kolonna]
                 if kauliņš != 0:
                     #kauliņš.draw_the_piece(game_window)
-                    print(type(kauliņš))
+                    #print(type(kauliņš))
+
                     self.draw_the_piece(kauliņš,[rinda,kolonna],game_window)
         self.draw_possible_moves(possible_moves,game_window)
         pygame.display.update()

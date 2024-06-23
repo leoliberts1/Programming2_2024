@@ -8,6 +8,8 @@ class SPĒLES_GALDS:
         self.red_left = self.white_left = 12
         self.red_queens = self.white_queens = 0
         self.create_the_game_table()
+        self.changes = 0
+        self.previous_changes = 0
 
     def draw_the_game_table(self, game_window):
         game_window.fill(BLACK)
@@ -49,6 +51,8 @@ class SPĒLES_GALDS:
         kauliņš.mooving(row, column)
         if row == ROWS - 1 or row == 0:
             kauliņš.crown()
+        self.changes +=1
+
 
     def get_piece(self, row, column):
         return self.game_table[row][column]

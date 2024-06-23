@@ -4,6 +4,8 @@ from .constants import WHITE, SQUARE_SIZE, GREY, CROWN
 class Kauliņš:
     padding = 13
     outline = 2
+    changes = 0
+    old_changes = 0
 
     def __init__(self, row, column, color):
         self.row = row
@@ -31,6 +33,7 @@ class Kauliņš:
     def mooving(self, row, column):
         self.row = row
         self.column = column
+        Kauliņš.changes +=1
         self.calculate_position()
 
     def __repr__(self):
