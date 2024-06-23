@@ -34,6 +34,7 @@ def main():
             break
         #we get the game table that will be sent to both clients
         game_table = game.game_table.game_table
+        previous_game_table = game_table.copy()
         print(game_table)
         '''[[0, (255, 255, 255), 0, (255, 255, 255), 0, (255, 255, 255), 0, (255, 255, 255)],
             [(255, 255, 255), 0, (255, 255, 255), 0, (255, 255, 255), 0, (255, 255, 255), 0],
@@ -53,11 +54,16 @@ def main():
             conn1.send(pickle.dumps(possible_moves, -1))
             conn2.send(pickle.dumps(game_table, -1))
             made_move = False
+            #conn2.send(pickle.dumps("Not your turn", -1))
             while made_move == False:
                 #Here I get the position of whatever the client has selected
                 row,column  = pickle.loads(conn1.recv(1024))
+                print(row,column)
                 game.select(row,column)
-            conn1.send(pickle.dumps("Not your turn",-1))
+                print([game.game_table.game_table,game.possible_moves],"This is the game table and the possible moves table before sending it again after something was selected")
+                conn1.send(pickle.dumps([game.game_table.game_table,game.possible_moves],-1))
+                if previous_game_table != game.game_table.game_table:
+                    made_move = True
         else:
             conn2.send(pickle.dumps("Your turn",-1))
             conn1.send(pickle.dumps(game_table, -1))

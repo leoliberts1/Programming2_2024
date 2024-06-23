@@ -32,7 +32,7 @@ class client_functions():
             row, column = move
             pygame.draw.circle(game_window, BLUE, (column * SQUARE_SIZE + SQUARE_SIZE // 2, row * SQUARE_SIZE + SQUARE_SIZE // 2), 10)
     def draw(self, game_window,game_table,possible_moves):
-        print(game_table)
+        print(game_table,"this is the game table")
         self.draw_the_game_table(game_window)
         for rinda in range(ROWS):
             for kolonna in range(COLUMNS):
@@ -45,7 +45,7 @@ class client_functions():
         pygame.display.update()
         print("success?")
 
-    def get_row_and_column_from_the_player(position):
+    def get_row_and_column_from_the_player(self,position):
         x, y = position
         row = y // SQUARE_SIZE
         column = x // SQUARE_SIZE

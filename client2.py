@@ -43,8 +43,9 @@ while YES:
             # vai vēl kko izdarījis.
                 position = pygame.mouse.get_pos()
                 rinda, kolonna = functions.get_row_and_column_from_the_player(position)
-                print(position)
+                #print(position)
                 print(rinda, kolonna)
+                s.send(pickle.dumps((rinda,kolonna),-1))
             #game.select(rinda, kolonna)
             #jāaizsūta ko džeks ir izvēlējies
 

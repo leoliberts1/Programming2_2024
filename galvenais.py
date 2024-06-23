@@ -38,6 +38,7 @@ def main():
                 #skatīsies vai šamējais ir kko pabīdījis,
                 # vai vēl kko izdarījis.
                 position = pygame.mouse.get_pos()
+                print(position,"this is position")
                 rinda,kolonna = get_row_and_column_from_the_player(position)
                 #print(position)
                 print(rinda,kolonna)
