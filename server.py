@@ -1,116 +1,66 @@
-import pickle, socket, pygame,time, copy
-from checkers_game.spēle import Spēle
-from checkers_game.constants import WIDTH,HEIGHT,COLUMNS,ROWS,SQUARE_SIZE,RED,WHITE,BLUE,BLACK
-from checkers_game.Kauliņi import Kauliņš
-server = socket.socket()
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-HOST = ""
-PORT = 8000
-try:
-    server.bind((HOST,PORT))
-except OSError as e:
-    print(e)
-    HOST = ""
-    PORT = 8080
-    server.bind((HOST,PORT))
+import socket
+import threading
+import pygame
+from checkers.constants import WIDTH, HEIGHT
+from checkers.game import Game
+import pickle
 
+HOST = '127.0.0.1'
+PORT = 65432
 
-server.listen(1)
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind((HOST, PORT))
+server.listen(2)
 
-conn1,addr1 = server.accept()
-conn1.send(pickle.dumps("Welcome to the server player 1",-1))
-print("player 1 has connected")
-conn2,addr2 = server.accept()
-conn2.send(pickle.dumps("Welcome to the server player 2",-1))
-print("player 2 has connected")
+clients = []
+games = {}
 
+def get_game_state(game):
+    return {
+        'board': game.board,
+        'turn': game.turn,
+        'selected': game.selected,
+        'valid_moves': game.valid_moves
+    }
 
-#galvenā funkcija kas rūpēsies lai tiktu piefiksēta katra spēlētāju
-#izdarība, lai spēli vispār varētu spēlēt, tā atjaunos skatlogu utml.
-def main():
-    #fps = 60
-    run = True
-    #clock = pygame.time.Clock()
-    game = Spēle(":)")
-    #kauliņš = Spēles_galds.dabūt_kauliņu(0,1)
-    #Spēles_galds.kustēties(kauliņš,3,4)
-    #"event loop" īstā funkcija kas strādās
-    while True :
-        if game.get_winner() != None:
-            print(game.get_winner())
+def handle_client(conn, player):
+    game = games[player]
+    conn.send(pickle.dumps(get_game_state(game)))
+    while True:
+        try:
+            data = conn.recv(4096)
+            if not data:
+                break
+            game_state = pickle.loads(data)
+            game.board = game_state['board']
+            game.turn = game_state['turn']
+            game.selected = game_state['selected']
+            game.valid_moves = game_state['valid_moves']
+            for client in clients:
+                if client != conn:
+                    client.sendall(pickle.dumps(get_game_state(game)))
+        except:
             break
-        #we get the game table that will be sent to both clients
-        game_table = game.game_table.game_table
-        previous_game_table = copy.deepcopy(game_table)
-        print(game_table)
-        '''[[0, (255, 255, 255), 0, (255, 255, 255), 0, (255, 255, 255), 0, (255, 255, 255)],
-            [(255, 255, 255), 0, (255, 255, 255), 0, (255, 255, 255), 0, (255, 255, 255), 0],
-            [0, (255, 255, 255), 0, 0, 0, (255, 255, 255), 0, (255, 255, 255)],
-                            [0, 0, (255, 255, 255), 0, 0, 0, 0, 0],
-                            [0, 0, 0, (255, 0, 0), 0, 0, 0, 0],
-                    [(255, 0, 0), 0, 0, 0, (255, 0, 0), 0, (255, 0, 0), 0],
-                [0, (255, 0, 0), 0, (255, 0, 0), 0, (255, 0, 0), 0, (255, 0, 0)],
-               [(255, 0, 0), 0, (255, 0, 0), 0, (255, 0, 0), 0, (255, 0, 0), 0]]
-               This is how the table will approximately look'''
-        possible_moves = game.possible_moves
-        print(possible_moves)
-        print("game turn = ", game.turn)
-        if game.turn == RED:
-            conn1.send(pickle.dumps("Your turn",-1))
-            conn1.send(pickle.dumps(game_table,-1))
-            time.sleep(0.1)
-            conn1.send(pickle.dumps(possible_moves, -1))
-            conn2.send(pickle.dumps(game_table, -1))
-            made_move = False
-            #conn2.send(pickle.dumps("Not your turn", -1))
-            while made_move == False:
-                #Here I get the position of whatever the client has selected
-                row,column  = pickle.loads(conn1.recv(1024))
-                print(row,column)
-                game.select(row,column)
-                print([game.game_table.game_table,game.possible_moves],"This is the game table and the possible moves table before sending it again after something was selected")
+    conn.close()
 
-                possible_moves = game.possible_moves
-                conn1.send(pickle.dumps([game_table,possible_moves],-1))
-                print(Kauliņš.old_changes,"old changes count")
-                print(Kauliņš.changes,"new count changes")
-                if Kauliņš.changes != Kauliņš.old_changes:
-                    made_move = True
-                    print(conn1,"Has ended their turn")
-                    conn1.send(pickle.dumps("Not your move",-1))
-                    #conn1.send(pickle.dumps(game.game_table.game_table,-1))
-                    Kauliņš.old_changes +=1
-        else:
-            conn2.send(pickle.dumps("Your turn", -1))
-            conn2.send(pickle.dumps(game_table, -1))
-            time.sleep(0.1)
-            conn2.send(pickle.dumps(possible_moves, -1))
-            conn1.send(pickle.dumps(game_table, -1))
-            made_move = False
-            # conn2.send(pickle.dumps("Not your turn", -1))
-            while made_move == False:
-                # Here I get the position of whatever the client has selected
-                row, column = pickle.loads(conn2.recv(1024))
-                print(row, column)
-                game.select(row, column)
-                print([game.game_table.game_table, game.possible_moves],
-                      "This is the game table and the possible moves table before sending it again after something was selected")
-                game_table = game.game_table.game_table
-                possible_moves = game.possible_moves
-                conn2.send(pickle.dumps([game_table, possible_moves], -1))
-                if Kauliņš.changes == Kauliņš.old_changes:
-                    made_move = True
-                    print(conn2, "Has ended their turn")
-                    conn2.send(pickle.dumps("Not your move", -1))
-                    conn2.send(pickle.dumps(game.game_table.game_table, -1))
-                    Kauliņš.old_changes += 1
+def main():
+    print("Server started, waiting for players to connect...")
+    pygame.init()
+    win = pygame.display.set_mode((WIDTH, HEIGHT))
+    game = Game(win)
+    threading.Thread(target=accept_connections, args=(game,)).start()
 
+def accept_connections(game):
+    while True:
+        conn, addr = server.accept()
+        print(f"Player {len(clients) + 1} has connected")
+        clients.append(conn)
+        games[len(clients)] = game
+        threading.Thread(target=handle_client, args=(conn, len(clients))).start()
 
-        #game.update()
-
-        #extra lietas ne no video
-        #SKATLOGS.fill(BALTA)
-        #pygame.display.flip()
-
-    #pygame.quit()
-main()
+if __name__ == "__main__":
+    main()

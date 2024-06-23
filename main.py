@@ -1,7 +1,3 @@
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
 import pygame
 import socket
 import pickle
@@ -25,8 +21,8 @@ def receive_data():
     while True:
         data = client.recv(4096)
         if data:
-            game_state = pickle.loads(data)
-            client_functions.set_game_state(game_state)
+            game = pickle.loads(data)
+            client_functions.set_game(game)
         pygame.display.update()
 
 threading.Thread(target=receive_data, daemon=True).start()

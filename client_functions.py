@@ -1,55 +1,35 @@
+import pickle
+
 import pygame
-from checkers_game.constants import WIDTH,HEIGHT,COLUMNS,ROWS,SQUARE_SIZE,RED,WHITE,BLUE,BLACK,GREY
+from checkers.game import Game
 
-class client_functions():
-    padding = 13
-    outline = 2
-    def __init__(self):
-        self.name = ("functions that do the same thing as the functions"
-                     "in the other files in respect to drawing the checkers table")
+class ClientFunctions:
+    def __init__(self, win, client):
+        self.win = win
+        self.client = client
+        self.game = None
 
-    def draw_the_game_table(self, game_window):
-        game_window.fill(BLACK)
-        for rinda in range(ROWS):
-            for kolonna in range(rinda % 2, COLUMNS, 2):
-                pygame.draw.rect(game_window, RED, (SQUARE_SIZE * kolonna, SQUARE_SIZE * rinda, SQUARE_SIZE, SQUARE_SIZE))
-    def draw_the_piece(self,kauliņš,position,game_window):
-        '''    def draw_the_piece(self, game_window):
-        rādiuss = SQUARE_SIZE // 2 - Kauliņš.padding
-        pygame.draw.circle(game_window, GREY, (self.x, self.y), rādiuss + Kauliņš.outline)
-        pygame.draw.circle(game_window, self.color, (self.x, self.y), rādiuss)
-        if self.queen:
-            game_window.blit(CROWN, (self.x - (CROWN.get_width() // 2), self.y - (CROWN.get_height() // 2)))'''
-        #print(kauliņš)
-        rādiuss = SQUARE_SIZE //2 - self.padding
-        krāsa = (255,255,255)
-        #if kauliņš == krāsa:
+    def set_game_state(self, game_state):
+        if not self.game:
+            self.game = Game(self.win)
+        self.game.board = game_state['board']
+        self.game.turn = game_state['turn']
+        self.game.selected = game_state['selected']
+        self.game.valid_moves = game_state['valid_moves']
+        print("Game object set:", self.game)
 
-        pygame.draw.circle(game_window, GREY, (kauliņš.x, kauliņš.y), rādiuss + self.outline)
-        pygame.draw.circle(game_window, kauliņš.color, (kauliņš.x,kauliņš.y), rādiuss)
-    def draw_possible_moves(self, moves, game_window):
-        for move in moves:
-            row, column = move
-            pygame.draw.circle(game_window, BLUE, (column * SQUARE_SIZE + SQUARE_SIZE // 2, row * SQUARE_SIZE + SQUARE_SIZE // 2), 10)
-    def draw(self, game_window,game_table,possible_moves):
-        print("this is the game table","client_functions")
-        self.draw_the_game_table(game_window)
-        for rinda in range(ROWS):
-            for kolonna in range(COLUMNS):
-                kauliņš = game_table[rinda][kolonna]
-                if kauliņš != 0:
-                    #kauliņš.draw_the_piece(game_window)
-                    #print(type(kauliņš))
+    def update(self):
+        if self.game:
+            self.game.update()
+        else:
+            print("Game object is not set.")
 
-                    self.draw_the_piece(kauliņš,[rinda,kolonna],game_window)
-        self.draw_possible_moves(possible_moves,game_window)
-        pygame.display.update()
-        print("success?")
-
-    def get_row_and_column_from_the_player(self,position):
-        x, y = position
-        row = y // SQUARE_SIZE
-        column = x // SQUARE_SIZE
-        return row, column
-    def __repr__(self):
-        return self.name
+    def select(self, row, col):
+        if self.game:
+            self.game.select(row, col)
+            self.client.send(pickle.dumps({
+                'board': self.game.board,
+                'turn': self.game.turn,
+                'selected': self.game.selected,
+                'valid_moves': self.game.valid_moves
+            }))
