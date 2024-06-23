@@ -4,21 +4,21 @@ This is a simple multiplayer Checkers game built using Python and Pygame. The ga
 
 ## Project Structure
 
-checkers_game/
-├── assets/
-│ ├── crown.png
-│ ├── init.py
-│ ├── board.py
-│ ├── constants.py
-│ ├── game.py
-│ └── piece.py
-├── client1.py
-├── client2.py
-├── client_functions.py
-├── main.py
-├── server.py
-├── README.md
-└── requirements.txt
+    checkers_game/
+    ├── assets/
+    │ ├── crown.png
+    │ ├── init.py
+    │ ├── board.py
+    │ ├── constants.py
+    │ ├── game.py
+    │ └── piece.py
+    ├── client1.py
+    ├── client2.py
+    ├── client_functions.py
+    ├── main.py
+    ├── server.py
+    ├── README.md
+    └── requirements.txt
 
 markdown
 
