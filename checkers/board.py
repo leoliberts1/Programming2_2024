@@ -6,16 +6,18 @@ from .piece import Piece
 class Board:
     def __init__(self):
         self.board = []
-        self.red_left = self.white_left = 12
-        self.red_kings = self.white_kings = 0
-        self.create_board()
+        self.red_left = self.white_left = 12  # Initial pieces count
+        self.red_kings = self.white_kings = 0  # Initial kings count
+        self.create_board()  # Set up the board
 
+    # Draw the board
     def draw_squares(self, win):
         win.fill(BLACK)
         for row in range(ROWS):
             for col in range(row % 2, COLS, 2):
                 pygame.draw.rect(win, RED, (row * SQUARE_SIZE, col * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
+    # Move a piece to a new position
     def move(self, piece, row, col):
         self.board[piece.row][piece.col], self.board[row][col] = self.board[row][col], self.board[piece.row][piece.col]
         piece.move(row, col)
@@ -27,9 +29,11 @@ class Board:
             else:
                 self.red_kings += 1
 
+    # Get the piece at a specific position
     def get_piece(self, row, col):
         return self.board[row][col]
 
+    # Create the internal representation of the board
     def create_board(self):
         for row in range(ROWS):
             self.board.append([])
@@ -44,6 +48,7 @@ class Board:
                 else:
                     self.board[row].append(0)
 
+    # Draw the board and pieces
     def draw(self, win):
         self.draw_squares(win)
         for row in range(ROWS):
@@ -52,6 +57,7 @@ class Board:
                 if piece != 0:
                     piece.draw(win)
 
+    # Remove captured pieces from the board
     def remove(self, pieces):
         for piece in pieces:
             self.board[piece.row][piece.col] = 0
@@ -61,14 +67,15 @@ class Board:
                 else:
                     self.white_left -= 1
 
+    # Check if there is a winner
     def winner(self):
         if self.red_left <= 0:
             return WHITE
         elif self.white_left <= 0:
             return RED
-
         return None
 
+    # Get valid moves for a piece
     def get_valid_moves(self, piece):
         moves = {}
         left = piece.col - 1
@@ -84,6 +91,7 @@ class Board:
 
         return moves
 
+    # Traverse the board to the left for valid moves
     def _traverse_left(self, start, stop, step, color, left, skipped=[]):
         moves = {}
         last = []
@@ -117,6 +125,7 @@ class Board:
 
         return moves
 
+    # Traverse the board to the right for valid moves
     def _traverse_right(self, start, stop, step, color, right, skipped=[]):
         moves = {}
         last = []
